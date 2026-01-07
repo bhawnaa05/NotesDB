@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { NoteType } from "@/types/note";
 import { Trash2, PenSquare, Plus, Loader2, Calendar, Clock, ArrowUpRight, Search } from "lucide-react";
 import toast from "react-hot-toast";
@@ -10,6 +11,7 @@ export default function HomePage() {
   const [notes, setNotes] = useState<NoteType[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     fetchNotes();
@@ -18,6 +20,12 @@ export default function HomePage() {
   const fetchNotes = async () => {
     try {
       const res = await fetch("/api/notes");
+
+      if (res.status === 401) {
+        router.push("/login"); // Redirect to login if unauthorized (expired)
+        return;
+      }
+
       const data = await res.json();
       setNotes(data.notes || []);
     } catch (error) {
@@ -44,7 +52,7 @@ export default function HomePage() {
     }
   };
 
-  const filteredNotes = notes.filter(note => 
+  const filteredNotes = notes.filter(note =>
     note.title.toLowerCase().includes(search.toLowerCase()) ||
     note.content.toLowerCase().includes(search.toLowerCase())
   );
@@ -73,7 +81,7 @@ export default function HomePage() {
           </span>
         </h1>
         <p className="text-xl text-muted-foreground leading-relaxed">
-          A professional workspace for your thoughts, ideas, and daily tasks. 
+          A professional workspace for your thoughts, ideas, and daily tasks.
           Everything stays organized, beautiful, and accessible.
         </p>
       </div>
@@ -131,7 +139,7 @@ export default function HomePage() {
             className="w-full pl-12 pr-4 py-3 bg-transparent border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
           />
         </div>
-        
+
         <Link
           href="/create"
           className="group inline-flex items-center gap-3 bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-600/90 text-primary-foreground px-6 py-3 rounded-xl font-semibold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-[1.02] active:scale-[0.98]"
@@ -181,7 +189,7 @@ export default function HomePage() {
               >
                 {/* Note accent line */}
                 <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-primary to-violet-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                
+
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-4">
                     <h3 className="text-xl font-bold text-foreground line-clamp-2 group-hover:text-primary transition-colors pr-4">
@@ -189,7 +197,7 @@ export default function HomePage() {
                     </h3>
                     <ArrowUpRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
                   </div>
-                  
+
                   <p className="text-muted-foreground line-clamp-4 text-sm leading-relaxed mb-6">
                     {note.content}
                   </p>
