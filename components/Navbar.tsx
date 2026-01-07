@@ -1,12 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useSession } from "next-auth/react";
-import UserMenu from "@/components/UserMenu";
 
 export default function Navbar() {
-    const { data: session, status } = useSession();
-
     return (
         <header className="sticky top-0 inset-x-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
             <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -22,30 +18,6 @@ export default function Navbar() {
                         </div>
                         <span className="font-bold text-xl tracking-tight text-gradient">Notionary</span>
                     </Link>
-
-                    <nav className="flex items-center gap-6">
-                        {status === "loading" ? (
-                            // Loading skeleton
-                            <div className="h-9 w-24 bg-muted/20 rounded-lg animate-pulse"></div>
-                        ) : session?.user ? (
-                            <UserMenu user={session.user} />
-                        ) : (
-                            <div className="flex items-center gap-4">
-                                <Link
-                                    href="/login"
-                                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                                >
-                                    Sign In
-                                </Link>
-                                <Link
-                                    href="/signup"
-                                    className="text-sm font-semibold bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
-                                >
-                                    Get Started
-                                </Link>
-                            </div>
-                        )}
-                    </nav>
                 </div>
             </div>
         </header>

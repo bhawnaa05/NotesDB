@@ -1,24 +1,16 @@
 import connectMongoDB from "@/lib/mongodb";
 import Note from "@/models/Note";
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+
 
 // CREATE NOTE
+// CREATE NOTE
 export async function POST(request: Request) {
-  const session = await auth();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const user = session?.user as any;
-
-  if (!session || !user || !user.email) {
-    return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
-  }
-
   const { title, content } = await request.json();
 
   await connectMongoDB();
 
-  // Optimized: Use ID from session
-  const created = await Note.create({ title, content, userId: user.id });
+  const created = await Note.create({ title, content });
 
   const note = {
     _id: created._id.toString(),
@@ -32,19 +24,9 @@ export async function POST(request: Request) {
 
 // GET ALL NOTES
 export async function GET() {
-  const session = await auth();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const user = session?.user as any;
-
-  if (!session || !user || !user.email) {
-    return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
-  }
-
   await connectMongoDB();
 
-  // Optimized: Use ID from session directly
-  // Using lean() for performance
-  const notes = await Note.find({ userId: user.id }).sort({ createdAt: -1 }).lean();
+  const notes = await Note.find({}).sort({ createdAt: -1 }).lean();
 
   const serialized = notes.map(n => ({
     ...n,

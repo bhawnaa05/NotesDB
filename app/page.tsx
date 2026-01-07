@@ -21,10 +21,6 @@ export default function HomePage() {
     try {
       const res = await fetch("/api/notes");
 
-      if (res.status === 401) {
-        router.push("/login"); // Redirect to login if unauthorized (expired)
-        return;
-      }
 
       const data = await res.json();
       setNotes(data.notes || []);
